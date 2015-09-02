@@ -1,0 +1,4 @@
+--require should
+--slow 100
+--growl
+--globals xModule

@@ -1,0 +1,23 @@
+{
+    "name": "little-bear",
+    "version": "0.1.0",
+    "description": "Node.js web framework.",
+    "repository": "iMumuMua/little-bear",
+    "main": "lib/index.js",
+    "author": "iMumuMua <imumu@foxmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.13.3"
+    },
+    "devDependencies": {
+        "mocha": "~2.2.1",
+        "should": "~5.2.0",
+        "istanbul": "~0.3.8",
+        "supertest": "~1.1.0"
+    },
+    "scripts": {
+        "test": "mocha --reporter spec --bail --check-leaks test/",
+        "test-ci": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --check-leaks test/",
+        "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks test/"
+    }
+}
