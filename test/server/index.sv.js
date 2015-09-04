@@ -11,5 +11,8 @@ exports.def = function(mods) {
         res.send('home');
     });
 
+    this.get('/app', function(req, res, next) {
+        res.send(req.appMid);
+    });
     
 };

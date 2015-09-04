@@ -18,6 +18,14 @@ describe('app', function() {
             .end(done);
     });
 
+    it('should get /app', function(done) {
+        request(app)
+            .get('/app')
+            .expect(200)
+            .expect('app')
+            .end(done);
+    });
+    
     it('should get /about', function(done) {
         request(app)
             .get('/about')
@@ -31,12 +39,7 @@ describe('app', function() {
             .get('/blog')
             .expect(200)
             .expect('test blog')
-            .end(function(err, res) {
-                if (err) done(err);
-                else {
-                    done();
-                }
-            });
+            .end(done);
     });
 
     it('should get /blog/public.js', function(done) {
