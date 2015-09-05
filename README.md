@@ -6,7 +6,7 @@
     - [Create a server directory](#create-a-server-directory)
     - [Run LittleBear app](#run-littlebear-app)
 - [Server Directory](#server-directory)
-    - [Static Files Server](#static-file-server)
+    - [Static Files Server](#static-files-server)
     - [Nodejs Server Script File](#nodejs-server-script-file)
         - [Modularization](#modularization)
         - [Routes](#routes)
