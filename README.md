@@ -12,8 +12,8 @@
         + [Routes](#routes)
 * [Classic Website Server](#classic-website-server)
 * [API Reference](#api-reference)
-    - [new LittleBear(opts)](#new-littlebearopts)
-    - [LittleBear.prototype.run(port)](#littlebear-prototype-runport)
+    - [new LittleBear(opts)](#new-littlebear-opts)
+    - [LittleBear.prototype.run(port)](#littlebear-proto-run-port)
 * [Features](#features)
 * [License](#license)
 
@@ -202,6 +202,8 @@ server/
 ```
 
 # API Reference
+
+<a name="new-littlebear-opts"></a>
 ## new LittleBear(opts)
 
 __Arguments__
@@ -231,6 +233,7 @@ var bear = new LittleBear({
 });
 ```
 
+<a name="littlebear-proto-run-port"></a>
 ## LittleBear.prototype.run(port)
 
 __Arguments__
