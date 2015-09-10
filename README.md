@@ -12,14 +12,12 @@
         + [Routes](#routes)
 * [Classic Website Server](#classic-website-server)
 * [API Reference](#api-reference)
-    - [new LittleBear(opts)](#new-littlebear-opts)
-    - [LittleBear.prototype.run(port)](#littlebear-prototype-run-port)
+    - [new LittleBear(opts)](#new-littlebearopts)
+    - [LittleBear.prototype.run(port)](#littlebear-prototype-runport)
 * [Features](#features)
 * [License](#license)
 
 # Quick Start
-1. [Create a server directory](#create-a-server-directory)
-2. [Run LittleBear app](#run-littlebear-app)
 
 ## Create a server directory
 A simple server looks like:
