@@ -6,7 +6,7 @@ exports.def = function(mods) {
         req.testMid = 'test';
         next();
     });
-    
+
     this.get('/', function(req, res, next) {
         res.send('home');
     });
@@ -14,5 +14,9 @@ exports.def = function(mods) {
     this.get('/app', function(req, res, next) {
         res.send(req.appMid);
     });
-    
+
+    this.get('/error', function(req, res, next) {
+        next(new Error('test error'));
+    });
+
 };

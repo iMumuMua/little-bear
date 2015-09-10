@@ -4,7 +4,18 @@ var path = require('path');
 
 var bear = new LittleBear({
     root: path.join(__dirname, 'server'),
-    port: 3000
+    beforeInitRoutes: function(app) {
+        app.use(function(req, res, next) {
+            req.appMid = 'app';
+            next();
+        });
+    },
+    afterInitRoutes: function(app) {
+        app.use(function(err, req, res, next) {
+            res.status(500).send(err.message);
+        });
+    },
+    serveStatic: true
 });
 var app = bear.app;
 
@@ -25,12 +36,20 @@ describe('app', function() {
             .expect('app')
             .end(done);
     });
-    
+
     it('should get /about', function(done) {
         request(app)
             .get('/about')
             .expect(200)
             .expect('test')
+            .end(done);
+    });
+
+    it('should get /error 500 and receive error message', function(done) {
+        request(app)
+            .get('/error')
+            .expect(500)
+            .expect('test error')
             .end(done);
     });
 
@@ -56,5 +75,5 @@ describe('app', function() {
             .expect(404)
             .end(done);
     });
-    
+
 });
