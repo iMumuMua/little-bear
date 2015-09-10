@@ -2,18 +2,20 @@
 `little-bear` is a web framework that base on express.
 
 # Table of contents
-- [Quick Start](#quick-start)
+* [Quick Start](#quick-start)
     - [Create a server directory](#create-a-server-directory)
     - [Run LittleBear app](#run-littlebear-app)
-- [Server Directory](#server-directory)
+* [Server Directory](#server-directory)
     - [Static Files Server](#static-files-server)
     - [Nodejs Server Script File](#nodejs-server-script-file)
-        - [Modularization](#modularization)
-        - [Routes](#routes)
-        - [app.sv.js](#app-sv-js)
-- [Classic Website Server](#classic-website-server)
-- [Features](#features)
-- [License](#license)
+        + [Modularization](#modularization)
+        + [Routes](#routes)
+* [Classic Website Server](#classic-website-server)
+* [API Reference](#api-reference)
+    - [new LittleBear(opts)](#new-littlebear-opts)
+    - [LittleBear.prototype.run(port)](#littlebear-prototype-run-port)
+* [Features](#features)
+* [License](#license)
 
 # Quick Start
 1. [Create a server directory](#create-a-server-directory)
@@ -73,10 +75,9 @@ var path = require('path');
 var LittleBear = require('little-bear');
 
 var bear = new LittleBear({
-    root: path.join(__dirname, 'server'),
-    port: 3000
+    root: path.join(__dirname, 'server')
 });
-bear.run();
+bear.run(3000);
 ```
 
 # Server Directory
@@ -179,31 +180,6 @@ exports.def = function() {
 };
 ```
 
-### app.sv.js
-In `app.sv.js`, the `def` function's context is an instance of express app.
-```
-server/
-├── sub-app/
-│   └── app.sv.js
-└── app.sv.js
-```
-
-/app.sv.js:
-```js
-exports.name = 'home';
-exports.def = function() {
-    var app = this;
-    var rootPath = __dirname;
-
-    app.engine('jade', require('jade').__express);
-    app.set('views', rootPath);
-    app.set('view engine', 'jade');
-};
-```
-
-In a directory, LittleBear will run modules `def` function order by:
-`app.sv.js` -> `index.sv.js` -> others server script
-
 # Classic Website Server
 ```
 server/
@@ -223,10 +199,51 @@ server/
 |   |   └── blog.js
 |   ├── css/
 │   |   └── blog.css
-|   ├── index.sv.js
-|   └── app.sv.js
-├── app.sv.js
+|   └── index.sv.js
 └── index.sv.js
+```
+
+# API Reference
+## new LittleBear(opts)
+
+__Arguments__
+
+* opts: {Object} - Initial options.
+    - root: {String} - The absolute path of server directory.
+    - initBeforeRoutes: {Function} - Init app before setting routes.
+    - initAfterRoutes: {Function} - Init app after setting routes.
+    - serveStatic: {Boolean} - If `true`, LittleBear will serve static files.
+
+__Example__
+
+```js
+var bear = new LittleBear({
+    root: path.join(__dirname, 'server'),
+    initBeforeRoutes: function(app) {
+        app.engine('jade', require('jade').__express);
+        app.set('views', rootPath);
+        app.set('view engine', 'jade');
+    },
+    initAfterRoutes: function(app) {
+        app.use(function(err, req, res, next) {
+            res.status(500).send(err.message);
+        });
+    },
+    serveStatic: true
+});
+```
+
+## LittleBear.prototype.run(port)
+
+__Arguments__
+
+* port: {Number} - The port number that LittleBear app will listen on.
+
+__Example__
+
+```js
+var bear = new LittleBear(opts);
+bear.run(3000);
 ```
 
 # Features

@@ -4,13 +4,13 @@ var path = require('path');
 
 var bear = new LittleBear({
     root: path.join(__dirname, 'server'),
-    beforeInitRoutes: function(app) {
+    initBeforeRoutes: function(app) {
         app.use(function(req, res, next) {
             req.appMid = 'app';
             next();
         });
     },
-    afterInitRoutes: function(app) {
+    initAfterRoutes: function(app) {
         app.use(function(err, req, res, next) {
             res.status(500).send(err.message);
         });
