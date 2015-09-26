@@ -6,14 +6,16 @@
     - [Create a server directory](#create-a-server-directory)
     - [Run LittleBear app](#run-littlebear-app)
 * [Server Directory](#server-directory)
-    - [Static Files Server](#static-files-server)
+    - [Static Files Middleware](#static-files-middleware)
     - [Nodejs Server Script File](#nodejs-server-script-file)
         + [Modularization](#modularization)
         + [Routes](#routes)
-* [Classic Website Server](#classic-website-server)
+        + [app.sv.js](#app-sv-js)
 * [API Reference](#api-reference)
     - [new LittleBear(opts)](#new-littlebear-opts)
+    - [LittleBear.prototype.init()](#littlebear-proto-init)
     - [LittleBear.prototype.run(port)](#littlebear-proto-run-port)
+    - [LittleBear.static(path)](#littbear-static-path)
 * [Features](#features)
 * [License](#license)
 
@@ -26,13 +28,11 @@ server/
 ├── theme.css
 ├── app.js
 ├── index.html
-└── index.sv.js
+└── app.sv.js
 ```
 
 index.sv.js:
 ```js
-exports.name = 'home';
-
 exports.def = function() {
     var path = require('path');
 
@@ -80,42 +80,53 @@ bear.run(3000);
 
 # Server Directory
 
-## Static Files Server
-In LittleBear server directory, all files are public **unless**:
-1. `node_modules/` directory
-2. has prefix `.`, such as `.git/`, `.gitignore`
-3. has prefix `_`, such as `_views/`
+## Static Files Middleware
+You could use `LittleBear.static` middleware to serve static files:
+```js
+exports.def = function() {
+    var LittleBear = require('little-bear');
+    this.use(LittleBear.static(__dirname));
+};
+```
+
+In static directory, all files are public **unless**:
+
+1. `node_modules/` directory  
+2. has prefix `.`, such as `.git/`, `.gitignore`  
+3. has prefix `_`, such as `_views/`  
+4. has suffix `.sv.js` or `.mod.js`  
 
 ## Nodejs Server Script File
-The file that has suffix `.sv.js` will be treated as server script file, `LittleBear` will require and run it.
+The file that has suffix `.sv.js` or `.mod.js` will be treated as server script file, `LittleBear` will require and run it.
 
 ### Modularization
-A server script file is a module, it must export `name` and `def`:
+A server script file that has suffix `.mod.js` is a module, it must export `name` and `def`:
 ```js
-exports.name = 'models.article';
+exports.name = 'models.Article';
 
 exports.def = function() {
-    var Article = function() {/*...*/};
+    var Article = {};
+    Article.find = function() {/*...*/};
     return Article;
 };
 ```
 
 If a module has dependencies, it should export `deps`:
 ```js
-exports.name = 'api.articles';
+exports.name = 'someArticles';
 
 exports.deps = {
-    Article: 'models.article'
+    Article: 'models.Article'
 };
 
 exports.def = function(mods) {
-    mods.Article.doSomething();
+    return mods.Article.find();
 };
 ```
 
 ### Routes
-LittleBear will set the routes automatically according to the file name.
-Each server script `def` function's context is an instance of `express.Router`.
+LittleBear will set the routes automatically according to the file name.  
+You could define routes in server script file that has suffix `.sv.js`. In these files, the context of `def` function is an instance of `express.Router` or `express.Application`.
 ```
 server/
 ├── api/
@@ -129,7 +140,6 @@ server/
 
 index.sv.js:
 ```js
-exports.name = 'home';
 exports.def = function() {
     // GET /
     this.get('/', function(req, res, next) {
@@ -140,7 +150,6 @@ exports.def = function() {
 
 about.sv.js:
 ```js
-exports.name = 'about';
 exports.def = function() {
     // GET /about
     this.get('/', function(req, res, next) {
@@ -151,11 +160,14 @@ exports.def = function() {
 
 api/articles.sv.js:
 ```js
-exports.name = 'articles';
-exports.def = function() {
+exports.deps = {
+    Article: 'models.Article'
+};
+
+exports.def = function(mods) {
     // GET /api/articles
     this.get('/', function(req, res, next) {
-        res.send('articles');
+        res.json(mods.Article.find());
     });
 
     // GET /api/articles/:id
@@ -169,7 +181,6 @@ exports.def = function() {
 
 blog/index.sv.js:
 ```js
-exports.name = 'blog';
 exports.def = function() {
     // GET /blog
     this.get('/', function(req, res, next) {
@@ -178,27 +189,26 @@ exports.def = function() {
 };
 ```
 
-# Classic Website Server
-```
-server/
-├── api/
-│   ├── articles.sv.js
-│   └── users.sv.js
-├── _views/
-│   ├── articles.jade
-│   └── index.jade
-├── assets/
-│   ├── js/
-|   |   └── app.js
-|   └── css/
-│       └── theme.css
-├── blog/
-│   ├── js/
-|   |   └── blog.js
-|   ├── css/
-│   |   └── blog.css
-|   └── index.sv.js
-└── index.sv.js
+<a name="app-sv-js"></a>
+### app.sv.js
+If a directory has `app.sv.js` file, the directory will be mount as a sub app.  
+The context of `def` function is an instance of `express.Application`.
+```js
+var LittleBear = require('little-bear');
+exports.def = function(mods, routes) {
+    this.engine('jade', require('jade').__express);
+    this.set('views', rootPath);
+    this.set('view engine', 'jade');
+
+    routes(); // init routes, it must be called
+
+    this.use(LittleBear.static(__dirname));
+
+    this.use(function(err, req, res, next) {
+        console.error(err.stack || err);
+        res.sendStatus(500);
+    });
+};
 ```
 
 # API Reference
@@ -210,31 +220,35 @@ __Arguments__
 
 * opts: {Object} - Initial options.
     - root: {String} - The absolute path of server directory.
-    - initBeforeRoutes: {Function} - Init app before setting routes.
-    - initAfterRoutes: {Function} - Init app after setting routes.
-    - serveStatic: {Boolean} - If `true`, LittleBear will serve static files.
 
 __Example__
 
 ```js
 var bear = new LittleBear({
-    root: path.join(__dirname, 'server'),
-    initBeforeRoutes: function(app) {
-        app.engine('jade', require('jade').__express);
-        app.set('views', rootPath);
-        app.set('view engine', 'jade');
-    },
-    initAfterRoutes: function(app) {
-        app.use(function(err, req, res, next) {
-            res.status(500).send(err.message);
-        });
-    },
-    serveStatic: true
+    root: path.join(__dirname, 'server')
 });
+```
+
+<a name="littlebear-proto-init"></a>
+## LittleBear.prototype.init()
+Only init modules and routes.
+
+__Return__
+
+* {Promise}
+
+__Example__
+
+```js
+var bear = new LittleBear(opts);
+bear.init().then(function(app) {
+    // app is an instance of express.Application
+}).catch(console.error);
 ```
 
 <a name="littlebear-proto-run-port"></a>
 ## LittleBear.prototype.run(port)
+Init and run LittleBear app.
 
 __Arguments__
 
@@ -245,6 +259,25 @@ __Example__
 ```js
 var bear = new LittleBear(opts);
 bear.run(3000);
+```
+
+<a name="littbear-static-path"></a>
+## LittleBear.static(path)
+Return a static server middleware.
+
+__Arguments__
+
+* path: {String} - The absolute path of static directory.
+
+__Example__
+
+In `app.sv.js`:
+```js
+var LittleBear = require('little-bear');
+exports.def = function(mods, routes) {
+    routes();
+    this.use(LittleBear.static(__dirname));
+};
 ```
 
 # Features
