@@ -1,5 +1,3 @@
-exports.name = 'home';
-
 exports.def = function(mods) {
 
     this.use(function(req, res, next) {

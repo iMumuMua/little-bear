@@ -3,23 +3,18 @@ var request = require('supertest');
 var path = require('path');
 
 var bear = new LittleBear({
-    root: path.join(__dirname, 'server'),
-    initBeforeRoutes: function(app) {
-        app.use(function(req, res, next) {
-            req.appMid = 'app';
-            next();
-        });
-    },
-    initAfterRoutes: function(app) {
-        app.use(function(err, req, res, next) {
-            res.status(500).send(err.message);
-        });
-    },
-    serveStatic: true
+    root: path.join(__dirname, 'server')
 });
-var app = bear.app;
 
 describe('app', function() {
+    var app;
+
+    before(function(done) {
+        bear.init().then(function(bearApp) {
+            app = bearApp;
+            done();
+        }).catch(done);
+    });
 
     it('should get /', function(done) {
         request(app)
@@ -33,7 +28,7 @@ describe('app', function() {
         request(app)
             .get('/app')
             .expect(200)
-            .expect('app')
+            .expect('test blog')
             .end(done);
     });
 

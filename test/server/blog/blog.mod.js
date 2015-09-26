@@ -1,4 +1,4 @@
-exports.name = 'model.blog';
+exports.name = 'models.Blog';
 
 exports.def = function(mods) {
     var blogs = ['test blog']

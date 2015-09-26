@@ -1,7 +1,5 @@
-exports.name = 'blog';
-
 exports.deps = {
-    Blog: 'model.blog'
+    Blog: 'models.Blog'
 };
 
 exports.def = function(mods) {
