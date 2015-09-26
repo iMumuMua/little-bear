@@ -47,6 +47,15 @@ describe('mod', function() {
         done();
     });
 
+    it('should get all mods', function(done) {
+        var mods = testSpace.getMods();
+        mods.a().should.equal('mod a');
+        mods.b.should.equal('mod a and mod b');
+        mods.c.should.equal('mod c');
+        (mods.d === null).should.be.true;
+        done();
+    });
+
     it('should run one mod', function(done) {
         var modB = testSpace.runMod('b');
         modB.should.equal('mod a and mod b');
