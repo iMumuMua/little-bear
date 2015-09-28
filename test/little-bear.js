@@ -71,4 +71,11 @@ describe('app', function() {
             .end(done);
     });
 
+    it('should get /noindex/no', function(done) {
+        request(app)
+            .get('/noindex/no')
+            .expect(200)
+            .end(done);
+    });
+
 });
