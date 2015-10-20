@@ -1,7 +1,7 @@
 # little-bear
-`little-bear` is a web framework that base on express.
-
 [![Build Status](https://travis-ci.org/iMumuMua/little-bear.svg?branch=master)](https://travis-ci.org/iMumuMua/little-bear)
+
+`little-bear` is a web framework that base on express.
 
 # Table of contents
 * [Quick Start](#quick-start)
