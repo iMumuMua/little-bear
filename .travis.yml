@@ -1,7 +1,6 @@
 language: node_js
 node_js:
-  - "0.10"
-  - "0.12"
-  - "iojs"
+  - "4.1"
+  - "4.0"
 script: "npm run-script test-ci"
 after_script: "npm install coveralls@2.11.0 && cat ./coverage/lcov.info | coveralls"
